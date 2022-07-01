@@ -1,118 +1,64 @@
-abstract class Department {
-  static fiscalYear = 2020;
-  // name: string;
-  // private readonly id: string;
-  protected employees: string[] = [];
-
-  constructor(protected readonly id: string, public name: string) {
-    // this.name = name;
-    // this.id = id;
-    // console.log(Department.fiscalYear)
-  }
-
-  static createEmployee(name: string) {
-    return { name };
-  }
-
-  abstract describe(this: Department): void;
-
-  addEmployee(employee: string) {
-    // this.id = "d2"
-    this.employees.push(employee);
-  }
-
-  printEmployeeInformation() {
-    console.log(this.employees.length);
-    console.log(this.employees);
-  }
+// type AddFn = (a: number, b: number) => number
+// in this case type is better than interface
+interface AddFn {
+  (a: number, b: number): number;
 }
 
-class ITDepartment extends Department {
-  admins: string[];
-  constructor(id: string, admins: string[]) {
-    super(id, 'IT');
-    this.admins = admins;
-  }
+let add: AddFn = (n1, n2) => {
+  return n1 + n2;
+};
 
-  describe(this: Department): void {
-    console.log('IT Department - ID');
-  }
+// type User {
+//   name: string;
+//   age: number;
+//   greet(phrase: string): void;
+// }
+// we use interface for object
+
+interface User {
+  name: string;
+  age: number;
+  greet(phrase: string): void;
 }
 
-class AccountingDepartment extends Department {
-  private lastReport: string;
-  private static instance: AccountingDepartment;
+let user1: User = {
+  name: 'Mathis',
+  age: 23,
+  greet(phrase) {
+    console.log(phrase + ' ' + this.name);
+  },
+};
 
-  get mostRecentReport() {
-    if (this.lastReport) {
-      return this.lastReport;
+user1.greet('Hi there');
+
+interface Named {
+  readonly name?: string;
+  outputName?: string;
+}
+
+interface Greetable extends Named {
+  greet(phrase: string): void;
+}
+
+class Person implements Greetable {
+  name?: string;
+  age = 23;
+
+  constructor(name?: string) {
+    if (name) {
+      this.name = name;
     }
-    throw new Error('No report found');
   }
 
-  set mostRecentReport(value: string) {
-    if (!value) {
-      throw new Error('Please pass in a valid value!');
+  greet(phrase: string) {
+    if (this.name) {
+      console.log(phrase + ' ' + this.name);
+    } else {
+      console.log('Hi');
     }
-    this.addReport(value);
-  }
-
-  private constructor(id: string, private reports: string[]) {
-    super(id, 'Account');
-    this.lastReport = reports[0];
-  }
-
-  static getInstance() {
-    if (AccountingDepartment.instance) return this.instance;
-    this.instance = new AccountingDepartment('d2', []);
-    return this.instance;
-  }
-
-  describe(this: Department): void {
-    console.log('Accounting - ID');
-  }
-
-  addEmployee(name: string) {
-    if (name === 'Mathis') return;
-
-    this.employees.push(name);
-  }
-
-  addReport(text: string) {
-    this.reports.push(text);
-    this.lastReport = text;
-  }
-
-  printReports() {
-    console.log(this.reports);
   }
 }
 
-const employee1 = Department.createEmployee('Math');
-console.log(employee1, Department.fiscalYear);
-
-const it = new ITDepartment('d1', ['Mathis']);
-console.log(it);
-
-it.addEmployee('Math');
-it.addEmployee('Lisa');
-
-// it.employees[2] = 'Anna';
-
-it.describe();
-it.printEmployeeInformation();
-
-// const itCopy = { name: 'maths', describe: it.describe };
-// itCopy.describe();
-
-const accounting = AccountingDepartment.getInstance();
-const accounting2 = AccountingDepartment.getInstance();
-
-console.log(accounting, accounting2);
-accounting.mostRecentReport = 'Year End Report';
-accounting.addReport('Something went wrong...');
-console.log(accounting.mostRecentReport);
-accounting.printReports();
-accounting.addEmployee('Mathis');
-accounting.addEmployee('Lisa');
-accounting.printEmployeeInformation();
+const person1: Greetable = new Person();
+person1.greet("Hi there, I'm");
+console.log(person1);
