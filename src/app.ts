@@ -1,66 +1,37 @@
-const userName = 'Mat';
-// userName = 'Mathis';
-let age = 30;
+class Department {
+  // name: string;
+  // private id: string;
+  private employees: string[] = [];
 
-age = 29;
+  constructor(private id: string, public name: string) {
+    // this.name = name;
+    // this.id = id;
+  }
 
-// function add(a: number, b: number) {
-//   let result;
-//   result = a + b;
-//   return result;
-// }
+  describe(this: Department): void {
+    console.log(`Department (${this.id}): ${this.name}`);
+  }
 
-// if(age > 20){
-//   var isOld = true
-//   let isOld = true
-// }
+  addEmployee(employee: string) {
+    this.employees.push(employee);
+  }
 
-// console.log(isOld)
-
-// console.log(result);
-
-const add = (a: number, b: number = 10) => a + b;
-
-console.log(add(1));
-
-// const printOutput: (a: number | string) => void = (output) =>
-//   console.log(output);
-
-const printOutput = (output: number | string) => console.log(output);
-
-printOutput(add(5, 2));
-
-const button = document.querySelector('button');
-
-if (button) {
-  button.addEventListener('click', (event) => console.log(event));
+  printEmployeeInformation() {
+    console.log(this.employees.length);
+    console.log(this.employees);
+  }
 }
 
-const hobbies = ['Sports', 'Cooking'];
-const activeHobbies = ['Hiking'];
-activeHobbies.push(...hobbies);
+const accounting = new Department('d1', 'Accounting');
+console.log(accounting);
 
-const person = {
-  name: 'Max',
-  age: 30,
-};
+accounting.addEmployee('Math');
+accounting.addEmployee('Lisa');
 
-// const copiedPerson = person false
-const copiedPerson = { ...person };
+// accounting.employees[2] = 'Anna';
 
-const newadd = (...numbers: number[]) => {
-  return numbers.reduce((acc, curr) => {
-    return acc + curr;
-  }, 0);
-};
-//   return numbers.reduce((acc, curr) => {
-//     return acc + curr;
-//   }, 0);
-// };
+accounting.describe();
+accounting.printEmployeeInformation();
 
-const addedNumbers = newadd(5, 10, 2, 3.7);
-console.log(addedNumbers);
-
-const [hobby1, hobby2, ...remainingHobbies] = hobbies;
-
-const { name: personName, age: personAge } = person;
+// const accountingCopy = { name: 'maths', describe: accounting.describe };
+// accountingCopy.describe();
