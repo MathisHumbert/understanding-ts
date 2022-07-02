@@ -1,165 +1,109 @@
-type Admin = {
-  name: string;
-  privileges: string[];
-};
+// const names: Array<string> = []; // same as string[]
 
-type Employee = {
-  name: string;
-  startDate: Date;
-};
+// const promise: Promise<number> = new Promise((resolve, reject) => {
+//   setTimeout(() => {
+//     resolve(10);
+//   }, 2000);
+// });
 
-// interface Admin {
-//   name: string;
-//   privileges: string[];
-// }
+// promise.then(data => {
+//   data.split(' ')
+// })
 
-// interface Employee {
-//   name: string;
-//   startDate: Date;
-// }
-
-// interface ElevatedEmployee extends Employee, Admin {};
-
-type ElevatedEmployee = Admin & Employee;
-
-const e1: ElevatedEmployee = {
-  name: 'Max',
-  privileges: ['create-server'],
-  startDate: new Date(),
-};
-
-type Combinable = string | number;
-type Numeric = number | boolean;
-type Universal = Combinable & Numeric;
-
-// TYPE GUARD & FUNCTION OVERLOAD
-function add(a: number, b: number): number;
-function add(a: string, b: string): string;
-function add(a: Combinable, b: Combinable) {
-  if (typeof a === 'string' || typeof b === 'string') {
-    return a.toString() + b.toString();
-  }
-  return a + b;
+// CONSTRAINS: <T extends object, U extends object> extends force us to pass object for T and U
+function merge<T extends object, U extends object>(objA: T, objB: U) {
+  return Object.assign(objA, objB);
 }
 
-// TS doesn't know if this is a number or a string
-const result1 = add(1, 5);
-const result2 = add('Mathis', 'Humbert') as string;
+const mergedObj = merge({ name: 'Math' }, { age: 23 });
+// const mergedObjBis = merge<{ name: string }, { age: number }>(
+//   { name: 'Math' },
+//   { age: 23 }
+// ); // TS does this by it's own behind the scene
+// const mergedObj = merge({ name: 'Math' }, { age: 23 }) as {name: string, age: number};
+console.log(mergedObj.age);
 
-type UnknownEmployee = Employee | Admin;
-
-function printEmployeeInformation(emp: UnknownEmployee) {
-  console.log('Name: ' + emp.name);
-  if ('privileges' in emp) {
-    console.log('Privileges: ' + emp.privileges);
-  }
-  if ('startDate' in emp) {
-    console.log('Start Date: ' + emp.startDate);
-  }
+interface Lengthy {
+  length: number;
 }
 
-printEmployeeInformation(e1);
-printEmployeeInformation({ name: 'Mathis', startDate: new Date() });
-
-class Car {
-  drive() {
-    console.log('Driving...');
+function countAndDescribe<T extends Lengthy>(element: T): [T, string] {
+  let descriptionText = 'Got no value.';
+  if (element.length === 1) {
+    descriptionText = 'Got 1 element.';
+  } else if (element.length > 1) {
+    descriptionText = 'Got ' + element.length + 'elements.';
   }
+  return [element, descriptionText];
 }
 
-class Truck {
-  drive() {
-    console.log('Driving a truck...');
+console.log(countAndDescribe('Hi there!'));
+console.log(countAndDescribe(['Sport', 'Cooking']));
+// console.log(countAndDescribe(10));
+
+function extractAndConvert<T extends object, U extends keyof T>(
+  obj: T,
+  key: U
+) {
+  return obj[key];
+}
+
+// extractAndConvert({}, 'name');
+extractAndConvert({ name: 'Mathis' }, 'name');
+
+class DataStorage<T extends string | number> {
+  private data: T[] = [];
+
+  addItem(item: T) {
+    this.data.push(item);
   }
 
-  loadCargo(amount: number) {
-    console.log('Loading cargo ... ' + amount);
+  removeItem(item: T) {
+    if (this.data.indexOf(item) === -1) return;
+    this.data.splice(this.data.indexOf(item), 1);
+  }
+
+  getItems() {
+    return [...this.data];
   }
 }
 
-type Vehicle = Car | Truck;
+const textStorage = new DataStorage<string>();
+textStorage.addItem('Max');
+textStorage.addItem('Manu');
+textStorage.addItem('Mat');
+console.log(textStorage.getItems());
 
-const v1 = new Car();
-const v2 = new Truck();
+const numberStorage = new DataStorage<number>();
 
-function useVehicle(vehicle: Vehicle) {
-  vehicle.drive();
-  // if ('loadCargo' in vehicle) {
-  //   vehicle.loadCargo(100);
-  // }
-  if (vehicle instanceof Truck) {
-    vehicle.loadCargo(100);
-  }
+// const objStorage = new DataStorage<object>();
+// const maxObj = { name: 'max' };
+// objStorage.addItem(maxObj);
+// objStorage.addItem({ name: 'manu' });
+// objStorage.removeItem(maxObj);
+// console.log(objStorage.getItems());
+
+// PARTIAL
+interface CourseGoal {
+  title: string;
+  description: string;
+  completeUntil: Date;
 }
 
-useVehicle(v1);
-useVehicle(v2);
+function createCourseGoal(
+  title: string,
+  description: string,
+  date: Date
+): CourseGoal {
+  let courseGoal: Partial<CourseGoal> = {};
+  courseGoal.title = title;
+  courseGoal.description = description;
+  courseGoal.completeUntil = date;
 
-// DISCRAMINATED UNIONS
-interface Bird {
-  type: 'bird';
-  flyingSpeed: number;
+  return courseGoal as CourseGoal;
 }
 
-interface Horse {
-  type: 'horse';
-  runningSpeed: number;
-}
-
-type Animal = Bird | Horse;
-
-function moveAnimal(animal: Animal) {
-  let speed;
-
-  switch (animal.type) {
-    case 'bird':
-      speed = animal.flyingSpeed;
-      break;
-    case 'horse':
-      speed = animal.runningSpeed;
-  }
-
-  console.log('Moving at speed: ' + speed);
-}
-
-moveAnimal({ type: 'bird', flyingSpeed: 100 });
-
-// const userInputElement = <HTMLInputElement>document.getElementById('user-input')!;
-// const userInputElement = document.getElementById(
-//   'user-input'
-// )! as HTMLInputElement;
-const userInputElement = document.getElementById('user-input');
-
-// userInputElement.value = 'Hi There';
-
-if (userInputElement) {
-  (userInputElement as HTMLInputElement).value = 'Hi There';
-}
-
-// INDEX PROPERTIES
-interface ErrorContainer {
-  // { email: 'Not a vaild email', username: 'Must start with a character' }
-  [prop: string]: string;
-}
-
-const errorBag: ErrorContainer = {
-  email: 'Not a valid email',
-  username: 'Must start with a character',
-};
-
-// OPTIONNAL CHAINING
-const fetchedUserData = {
-  id: 'u1',
-  name: 'Math',
-  job: { title: 'CEO', description: 'My own company' },
-};
-
-console.log(fetchedUserData?.job?.title);
-
-// NULLISH COALESCING
-// const userInput = null;
-const userInput = '';
-
-// ?? if this is null or undifined
-const storedData = userInput ?? 'DEFAULT';
-console.log(storedData);
+// READONLY
+const names: Readonly<string[]> = ['Max', 'Anna'];
+// names.push('Manu');
+// names.pop()
